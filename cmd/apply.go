@@ -5,16 +5,16 @@ package cmd
 
 import (
 	"buckmate/main/common/exception"
-	"buckmate/main/common/util"
 	"buckmate/main/config"
+	"buckmate/main/deployment"
 	"buckmate/structs"
 
 	"github.com/spf13/cobra"
 )
 
-// configCmd represents the config command
-var configCmd = &cobra.Command{
-	Use:   "config",
+// applyCmd represents the apply command
+var applyCmd = &cobra.Command{
+	Use:   "apply",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -26,19 +26,21 @@ to quickly create a Cobra application.`,
 		env, err := cmd.Flags().GetString("env")
 		exception.Handle(structs.Exception{Err: err, Message: "Environment not set."})
 		config := config.Load(env)
-		util.ReplaceInFiles("buckmate/build", config.ConfigMap)
+		deployment := deployment.Load()
+		
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(configCmd)
+	rootCmd.AddCommand(applyCmd)
+
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// configCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// applyCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// configCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// applyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

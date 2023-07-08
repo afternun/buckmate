@@ -1,0 +1,8 @@
+source:
+  path: s3://registry/ui
+target:
+  path: s3://ui
+  tags:
+    customTag: customTagValue
+  defaultTags:
+    version: true
