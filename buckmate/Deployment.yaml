@@ -1,7 +1,7 @@
 source:
-  path: s3://registry/ui
+  path: buckmate-source
 target:
-  path: s3://ui
+  path: buckmate-target
   tags:
     customTag: customTagValue
   defaultTags:
