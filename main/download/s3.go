@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -26,6 +27,7 @@ func S3(bucket string, prefix string) {
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
 		o.Region = "eu-central-1"
 	})
+
 	manager := manager.NewDownloader(client)
 
 	paginator := s3.NewListObjectsV2Paginator(client, &s3.ListObjectsV2Input{
@@ -42,7 +44,7 @@ func S3(bucket string, prefix string) {
 		for _, obj := range page.Contents {
 			fmt.Printf("Current obj %s \n", aws.ToString(obj.Key))
 			if obj.Size > 0 {
-				if err := downloadToFile(manager, LocalDirectory, bucket, aws.ToString(obj.Key)); err != nil {
+				if err := downloadToFile(manager, LocalDirectory, bucket, aws.ToString(obj.Key), prefix); err != nil {
 					log.Fatalln("error:", err)
 				}
 			}
@@ -50,9 +52,10 @@ func S3(bucket string, prefix string) {
 	}
 }
 
-func downloadToFile(downloader *manager.Downloader, targetDirectory, bucket, key string) error {
+func downloadToFile(downloader *manager.Downloader, targetDirectory, bucket, key string, prefix string) error {
 	// Create the directories in the path
-	file := filepath.Join(targetDirectory, key)
+	file := filepath.Clean(strings.Replace(filepath.Join(targetDirectory, key), prefix, "", 1))
+
 	if err := os.MkdirAll(filepath.Dir(file), 0775); err != nil {
 		return err
 	}

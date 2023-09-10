@@ -11,8 +11,8 @@ import (
 	"buckmate/main/download"
 	"buckmate/main/upload"
 	"buckmate/structs"
-	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -31,11 +31,11 @@ to quickly create a Cobra application.`,
 		exception.Handle(structs.Exception{Err: err, Message: "Environment not set."})
 		config := config.Load(env)
 		deployment := deployment.Load()
-		fmt.Printf("%v %v", config, deployment)
-		fmt.Printf("Wersja do pobrania %s", config.Version)
+		buckmateVersion := uuid.New().String()
+
 		download.S3(deployment.Source.Path, config.Version)
 		util.ReplaceInFiles("build", config.ConfigMap)
-		upload.S3(deployment.Target.Path, "")
+		upload.S3(deployment.Target.Path, "", buckmateVersion)
 		// list := []string{"test", "test2"}
 		// upload.S3(list, "file Key")
 	},
