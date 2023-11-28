@@ -1,8 +1,6 @@
 package download
 
 import (
-	"buckmate/main/common/exception"
-	"buckmate/structs"
 	"context"
 	"fmt"
 	"log"
@@ -21,8 +19,10 @@ var (
 )
 
 func S3(bucket string, prefix string) {
-	cfg, cfgErr := config.LoadDefaultConfig(context.TODO())
-	exception.Handle(structs.Exception{Err: cfgErr, Message: "Couldn't get config."})
+	cfg, err := config.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		log.Fatalln("Could not load AWS config: ", err)
+	}
 
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
 		o.Region = "eu-central-1"
