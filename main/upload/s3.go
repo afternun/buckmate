@@ -1,8 +1,6 @@
 package upload
 
 import (
-	"buckmate/main/common/exception"
-	"buckmate/structs"
 	"context"
 	"fmt"
 	"log"
@@ -31,7 +29,9 @@ func S3(bucket string, prefix string, version string) {
 	}()
 
 	cfg, cfgErr := config.LoadDefaultConfig(context.TODO())
-	exception.Handle(structs.Exception{Err: cfgErr, Message: "Couldn't get config."})
+	if cfgErr != nil {
+		log.Fatalln("Could not get AWS config")
+	}
 
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
 		o.Region = "eu-central-1"
@@ -48,22 +48,31 @@ func S3(bucket string, prefix string, version string) {
 	metadata := map[string]string{"buckmate-version": version}
 	for path := range walker {
 		rel, err := filepath.Rel(LocalDirectory, path)
-		exception.Handle(structs.Exception{Err: err, Message: "Couldn't get relative path."})
+		if err != nil {
+			log.Fatalln("Could not get relative path to file " + path)
+		}
 
 		file, err := os.Open(path)
-		exception.Handle(structs.Exception{Err: err, Message: "Failed to open file"})
+		if err != nil {
+			log.Fatalln("Failed to open file " + path)
+		}
 
 		defer file.Close()
+		fileKey := aws.String(filepath.Join(prefix, rel))
 		result, err := uploader.Upload(context.TODO(), &s3.PutObjectInput{
 			Bucket:   &bucket,
-			Key:      aws.String(filepath.Join(prefix, rel)),
+			Key:      fileKey,
 			Body:     file,
 			Metadata: metadata,
 		})
-		exception.Handle(structs.Exception{Err: err, Message: "Failed to upload"})
+		if err != nil {
+			log.Fatalln("Failed to upload file " + *fileKey)
+		}
 		log.Println("Uploaded", path, result.Location)
 	}
-	os.RemoveAll(LocalDirectory)
+	if err := os.RemoveAll(LocalDirectory); err != nil {
+		log.Fatalln("Failed to remove temporary build directory")
+	}
 	removeVersion(bucket, paginator, headObjClient, removeObjClient, version)
 }
 
