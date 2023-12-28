@@ -1,8 +1,0 @@
-source:
-  path: buckmate-source
-target:
-  path: buckmate-target
-  tags:
-    customTag: customTagValue
-  defaultTags:
-    version: true

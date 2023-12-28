@@ -14,11 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-var (
-	LocalDirectory = "build"
-)
-
-func S3(bucket string, prefix string) {
+func S3(bucket string, prefix string, tempDir string) {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		log.Fatalln("Could not load AWS config: ", err)
@@ -44,7 +40,7 @@ func S3(bucket string, prefix string) {
 		for _, obj := range page.Contents {
 			fmt.Printf("Current obj %s \n", aws.ToString(obj.Key))
 			if obj.Size > 0 {
-				if err := downloadToFile(manager, LocalDirectory, bucket, aws.ToString(obj.Key), prefix); err != nil {
+				if err := downloadToFile(manager, tempDir, bucket, aws.ToString(obj.Key), prefix); err != nil {
 					log.Fatalln("error:", err)
 				}
 			}

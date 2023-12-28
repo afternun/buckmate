@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"buckmate/main/common/constants"
 	"buckmate/main/common/util"
 	"buckmate/main/deployment"
 	"log"
@@ -19,8 +18,19 @@ buckmate config`,
 		if err != nil {
 			log.Fatalln("Could not get --env flag")
 		}
-		config := deployment.Load(env)
-		util.ReplaceInFiles(constants.BUILD_DIRECTORY, config.ConfigBoundary, config.ConfigMap)
+		path, err := cmd.Flags().GetString("path")
+		if err != nil {
+			log.Fatalln("Could not get --path flag")
+		}
+		rootDir := path + "/buckmate"
+
+		tempDir := util.RandomDirectory()
+		config := deployment.Load(env, rootDir)
+		util.CopyDirectory(rootDir+"/files", tempDir)
+		util.CopyDirectory(rootDir+"/"+env+"/files", tempDir)
+		util.ReplaceInFiles(tempDir, config.ConfigBoundary, config.ConfigMap)
+
+		log.Println("You can view your configuration in " + tempDir)
 	},
 }
 

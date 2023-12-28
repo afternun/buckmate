@@ -1,13 +1,13 @@
 package structs
 
-type bucket struct {
-	Bucket string `yaml:"bucket"`
+type Location struct {
+	Address string `yaml:"address"`
 	Prefix string `yaml:"prefix"`
 }
 
 type Deployment struct {
-	Source         bucket            `yaml:"source"`
-	Target         bucket            `yaml:"target"`
+	Source         Location            `yaml:"source"`
+	Target         Location            `yaml:"target"`
 	ConfigBoundary string            `yaml:"configBoundary"`
 	ConfigMap      map[string]string `yaml:"configMap"`
 }
