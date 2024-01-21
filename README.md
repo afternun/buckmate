@@ -1,5 +1,7 @@
 # buckmate
 
+![buckmate-logo](docs/docs/assets/logo.png)
+
 Visit [buckmate.org](https://buckmate.org) for more information!
 
 ## Made primarily to deploy static websites to AWS S3, however it can be used to:
