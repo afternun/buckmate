@@ -1,4 +1,4 @@
-![buckmate logo](assets/buckmatelogo5.svg){ align=left }
+![buckmate logo](assets/logo.svg){ align=left }
 
 # **BUCKMATE** is a **file transfer as code** tool - move your files between various locations **declaratively**.
 
