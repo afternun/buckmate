@@ -5,9 +5,13 @@ package cmd
 
 import (
 	"buckmate/main/common/exception"
+	"buckmate/main/common/util"
 	"buckmate/main/config"
 	"buckmate/main/deployment"
+	"buckmate/main/download"
+	"buckmate/main/upload"
 	"buckmate/structs"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -27,7 +31,13 @@ to quickly create a Cobra application.`,
 		exception.Handle(structs.Exception{Err: err, Message: "Environment not set."})
 		config := config.Load(env)
 		deployment := deployment.Load()
-		
+		fmt.Printf("%v %v", config, deployment)
+		fmt.Printf("Wersja do pobrania %s", config.Version)
+		download.S3(deployment.Source.Path, config.Version)
+		util.ReplaceInFiles("build", config.ConfigMap)
+		upload.S3(deployment.Target.Path, "")
+		// list := []string{"test", "test2"}
+		// upload.S3(list, "file Key")
 	},
 }
 
