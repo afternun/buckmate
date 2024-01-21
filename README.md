@@ -1,10 +1,8 @@
-# buckmate
-
 ![buckmate-logo](docs/docs/assets/logo.png)
 
 Visit [buckmate.org](https://buckmate.org) for more information!
 
-## Made primarily to deploy static websites to AWS S3, however it can be used to:
+## buckmate - made primarily to deploy static websites to AWS S3, however it can be used to:
 * transfer files between **buckets**,
 * transfer files between **servers** and **buckets**,
 * **replace content** in transfered files according to **yaml configuration**.

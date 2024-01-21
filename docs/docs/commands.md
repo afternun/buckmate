@@ -1,4 +1,13 @@
 # Commands
+
+Common flags for every command:
+
+| Flag   | Short | Description                                          | Default |
+|--------|-------|------------------------------------------------------|---------|
+| `--env`  | `-e`    | Specifies environment specific configuration         | -       |
+| `--path` | `-p`    | Specifies directory that contains buckmate directory | -       |
+| `--log` | `-l`    | Specifies log level, available options: TraceLevel, DebugLevel, InfoLevel, WarnLevel, ErrorLevel, FatalLevel, PanicLevel | InfoLevel       |
+
 ## apply
 
 Applies deployment to the infrastructure.
@@ -9,11 +18,6 @@ Applies deployment to the infrastructure.
 4. Scan and replace any config map values
 5. Upload complete package to target address
 
-| Flag   | Short | Description                                          | Default |
-|--------|-------|------------------------------------------------------|---------|
-| `--env`  | `-e`    | Specifies environment specific configuration         | -       |
-| `--path` | `-p`    | Specifies directory that contains buckmate directory | -       |
-
 ## config
 
 Applies config to local files, without downloading files from `source`
@@ -21,8 +25,3 @@ Applies config to local files, without downloading files from `source`
 1. Copy files from common configuration
 2. Copy files from environment specific configuration (if `--env` flag provided)
 3. Scan and replace any config map values
-
-| Flag   | Short | Description                                          | Default |
-|--------|-------|------------------------------------------------------|---------|
-| `--env`  | `-e`    | Specifies environment specific configuration         | -       |
-| `--path` | `-p`    | Specifies directory that contains buckmate directory | -       |
