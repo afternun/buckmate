@@ -3,7 +3,8 @@ package cmd
 import (
 	"buckmate/main/common/util"
 	"buckmate/main/deployment"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
 )
@@ -16,21 +17,27 @@ buckmate config`,
 	Run: func(cmd *cobra.Command, args []string) {
 		env, err := cmd.Flags().GetString("env")
 		if err != nil {
-			log.Fatalln("Could not get --env flag")
+			log.Fatal(err)
 		}
 		path, err := cmd.Flags().GetString("path")
 		if err != nil {
-			log.Fatalln("Could not get --path flag")
+			log.Fatal(err)
 		}
 		rootDir := path + "/buckmate"
 
 		tempDir := util.RandomDirectory()
 		config := deployment.Load(env, rootDir)
-		util.CopyDirectory(rootDir+"/files", tempDir)
-		util.CopyDirectory(rootDir+"/"+env+"/files", tempDir)
+		err = util.CopyDirectory(rootDir+"/files", tempDir)
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = util.CopyDirectory(rootDir+"/"+env+"/files", tempDir)
+		if err != nil {
+			log.Fatal(err)
+		}
 		util.ReplaceInFiles(tempDir, config.ConfigBoundary, config.ConfigMap)
 
-		log.Println("You can view your configuration in " + tempDir)
+		log.Info("You can view your configuration in: " + tempDir)
 	},
 }
 

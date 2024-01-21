@@ -5,7 +5,9 @@ import (
 	"buckmate/main/deployment"
 	"buckmate/main/download"
 	"buckmate/main/upload"
-	"log"
+
+	log "github.com/sirupsen/logrus"
+
 	"strings"
 
 	"github.com/google/uuid"
@@ -21,11 +23,11 @@ buckmate apply
 	Run: func(cmd *cobra.Command, args []string) {
 		env, err := cmd.Flags().GetString("env")
 		if err != nil {
-			log.Fatalln("Could not get --env flag")
+			log.Fatal(err)
 		}
 		path, err := cmd.Flags().GetString("path")
 		if err != nil {
-			log.Fatalln("Could not get --path flag")
+			log.Fatal(err)
 		}
 
 		s3Prefix := "s3://"
@@ -41,11 +43,20 @@ buckmate apply
 			if !strings.HasPrefix(deploymentConfig.Source.Address, "/") {
 				deploymentConfig.Source.Address = path + "/" + deploymentConfig.Source.Address
 			}
-			util.CopyDirectory(deploymentConfig.Source.Address, tempDir)
+			err := util.CopyDirectory(deploymentConfig.Source.Address, tempDir)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 
-		util.CopyDirectory(rootDir+"/files", tempDir)
-		util.CopyDirectory(rootDir+"/"+env+"/files/", tempDir)
+		err = util.CopyDirectory(rootDir+"/files", tempDir)
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = util.CopyDirectory(rootDir+"/"+env+"/files/", tempDir)
+		if err != nil {
+			log.Fatal(err)
+		}
 		util.ReplaceInFiles(tempDir, deploymentConfig.ConfigBoundary, deploymentConfig.ConfigMap)
 
 		if strings.HasPrefix(deploymentConfig.Target.Address, s3Prefix) {

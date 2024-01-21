@@ -21,13 +21,6 @@ func CopyDirectory(scrDir string, dest string) error {
 			return err
 		}
 
-		// stat, ok := fileInfo.Sys().(*syscall.Stat_t)
-		// if !ok {
-		// return fmt.Errorf("failed to get raw syscall.Stat_t data for '%s'", sourcePath)
-		// }
-
-		// fileMode := fileInfo.Mode() & os.ModeType
-
 		if fileInfo.IsDir() {
 			if err := CreateIfNotExists(destPath, 0755); err != nil {
 				return err
@@ -40,12 +33,6 @@ func CopyDirectory(scrDir string, dest string) error {
 				return err
 			}
 		}
-
-		//TODO: Verify if needed
-		// if err := os.Lchown(destPath, int(stat.Uid), int(stat.Gid)); err != nil {
-		// return err
-		// }
-
 	}
 	return nil
 }
