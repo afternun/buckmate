@@ -1,9 +1,8 @@
 package util
 
 import (
-	"buckmate/main/common/exception"
-	"buckmate/structs"
 	"bytes"
+	"log"
 	"os"
 
 	"dario.cat/mergo"
@@ -23,24 +22,30 @@ func YamlToStruct(data []byte, dest interface{}) error {
 	return yaml.UnmarshalStrict([]byte(data), dest)
 }
 
-func ReplaceInFiles(path string, configMap map[string]string) {
+func ReplaceInFiles(path string, boundary string, configMap map[string]string) {
 	files, err := os.ReadDir(path)
-	exception.Handle(structs.Exception{Err: err, Message: "Couldn't list files under " + path})
+	if err != nil {
+		log.Fatalln("Couldn't list files under " + path)
+	}
 	for _, file := range files {
 		if !file.IsDir() {
-			err := ReplaceInFile(path+"/"+file.Name(), configMap)
-			exception.Handle(structs.Exception{Err: err, Message: "Couldn't apply config map to " + path})
+			err := ReplaceInFile(path+"/"+file.Name(), boundary, configMap)
+			if err != nil {
+				log.Fatalln("Couldn't apply config map to " + path)
+			}
 		} else {
-			ReplaceInFiles(path+"/"+file.Name(), configMap)
+			ReplaceInFiles(path+"/"+file.Name(), boundary, configMap)
 		}
 	}
 }
 
-func ReplaceInFile(path string, configMap map[string]string) error {
+func ReplaceInFile(path string, boundary string, configMap map[string]string) error {
 	read, err := os.ReadFile(path)
-	exception.Handle(structs.Exception{Err: err, Message: "Couldn't load file " + path})
+	if err != nil {
+		log.Fatalln("Could not load file " + path)
+	}
 	for key, value := range configMap {
-		read = bytes.ReplaceAll(read, []byte("@@@"+key+"@@@"), []byte(value))
+		read = bytes.ReplaceAll(read, []byte(boundary+key+boundary), []byte(value))
 	}
 	return os.WriteFile(path, read, os.FileMode(int(0644)))
 }

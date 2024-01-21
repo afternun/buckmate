@@ -1,20 +1,13 @@
 package structs
 
-type defaultTags struct {
-	Version bool `yaml:"version"`
-}
-
-type source struct {
-	Path string `yaml:"path"`
-}
-
-type target struct {
-	Path        string            `yaml:"path"`
-	Tags        map[string]string `yaml:"tags"`
-	DefaultTags defaultTags       `yaml:"defaultTags"`
+type bucket struct {
+	Bucket string `yaml:"bucket"`
+	Prefix string `yaml:"prefix"`
 }
 
 type Deployment struct {
-	Source source `yaml:"source"`
-	Target target `yaml:"target"`
+	Source         bucket            `yaml:"source"`
+	Target         bucket            `yaml:"target"`
+	ConfigBoundary string            `yaml:"configBoundary"`
+	ConfigMap      map[string]string `yaml:"configMap"`
 }
