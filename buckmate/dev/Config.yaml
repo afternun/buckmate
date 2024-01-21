@@ -1,3 +1,0 @@
-version: 1.2.1/
-configMap:
-  header: Hello This Was Dynamically Replaced By Buckmate, Your Personal Bucket Mate!

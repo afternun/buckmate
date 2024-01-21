@@ -14,15 +14,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
 
-var (
-	LocalDirectory = "build"
-)
-
-func S3(bucket string, prefix string, version string) {
+func S3(bucket string, prefix string, version string, tempDir string) {
 	walker := make(fileWalk)
 	go func() {
 		// Gather the files to upload by walking the path recursively
-		if err := filepath.Walk(LocalDirectory, walker.Walk); err != nil {
+		if err := filepath.Walk(tempDir, walker.Walk); err != nil {
 			log.Fatalln("Walk failed:", err)
 		}
 		close(walker)
@@ -47,7 +43,7 @@ func S3(bucket string, prefix string, version string) {
 	uploader := manager.NewUploader(s3.NewFromConfig(cfg))
 	metadata := map[string]string{"buckmate-version": version}
 	for path := range walker {
-		rel, err := filepath.Rel(LocalDirectory, path)
+		rel, err := filepath.Rel(tempDir, path)
 		if err != nil {
 			log.Fatalln("Could not get relative path to file " + path)
 		}
@@ -70,7 +66,7 @@ func S3(bucket string, prefix string, version string) {
 		}
 		log.Println("Uploaded", path, result.Location)
 	}
-	if err := os.RemoveAll(LocalDirectory); err != nil {
+	if err := os.RemoveAll(tempDir); err != nil {
 		log.Fatalln("Failed to remove temporary build directory")
 	}
 	removeVersion(bucket, paginator, headObjClient, removeObjClient, version)

@@ -6,6 +6,7 @@ import (
 	"buckmate/main/download"
 	"buckmate/main/upload"
 	"log"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
@@ -22,12 +23,42 @@ buckmate apply
 		if err != nil {
 			log.Fatalln("Could not get --env flag")
 		}
-		deploymentConfig := deployment.Load(env)
+		path, err := cmd.Flags().GetString("path")
+		if err != nil {
+			log.Fatalln("Could not get --path flag")
+		}
+
+		s3Prefix := "s3://"
+		rootDir := path + "/buckmate"
+		tempDir := util.RandomDirectory()
+		deploymentConfig := deployment.Load(env, rootDir)
 		buckmateVersion := uuid.New().String()
 
-		download.S3(deploymentConfig.Source.Bucket, deploymentConfig.Source.Prefix)
-		util.ReplaceInFiles("build", deploymentConfig.ConfigBoundary, deploymentConfig.ConfigMap)
-		upload.S3(deploymentConfig.Target.Bucket, deploymentConfig.Target.Prefix, buckmateVersion)
+		if strings.HasPrefix(deploymentConfig.Source.Address, s3Prefix) {
+			deploymentConfig.Source.Address = strings.Replace(deploymentConfig.Source.Address, s3Prefix, "", 1)
+			download.S3(deploymentConfig.Source.Address, deploymentConfig.Source.Prefix, tempDir)
+		} else {
+			if !strings.HasPrefix(deploymentConfig.Source.Address, "/") {
+				deploymentConfig.Source.Address = path + "/" + deploymentConfig.Source.Address
+			}
+			util.CopyDirectory(deploymentConfig.Source.Address, tempDir)
+		}
+
+		util.CopyDirectory(rootDir+"/files", tempDir)
+		util.CopyDirectory(rootDir+"/"+env+"/files/", tempDir)
+		util.ReplaceInFiles(tempDir, deploymentConfig.ConfigBoundary, deploymentConfig.ConfigMap)
+
+		if strings.HasPrefix(deploymentConfig.Target.Address, s3Prefix) {
+			deploymentConfig.Target.Address = strings.Replace(deploymentConfig.Target.Address, s3Prefix, "", 1)
+			upload.S3(deploymentConfig.Target.Address, deploymentConfig.Target.Prefix, buckmateVersion, tempDir)
+		} else {
+			if !strings.HasPrefix(deploymentConfig.Target.Address, "/") {
+				deploymentConfig.Target.Address = path + "/" + deploymentConfig.Target.Address
+			}
+			util.CopyDirectory(tempDir, deploymentConfig.Target.Address)
+		}
+
+		util.RemoveDirectory(tempDir)
 	},
 }
 
