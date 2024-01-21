@@ -10,9 +10,7 @@
 
 === "Download latest release from GitHub"
 
-    ```
-    curl link && mv buckmate /usr/local/bin
-    ```
+    [Releases](https://github.com/afternun/buckmate/releases)
 
 !!! note "Configure AWS credentials"
 
