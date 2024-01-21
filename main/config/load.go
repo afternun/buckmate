@@ -4,7 +4,6 @@ import (
 	"buckmate/main/common/exception"
 	"buckmate/main/common/util"
 	"buckmate/structs"
-	"fmt"
 )
 
 func Load(env string) structs.Config {
@@ -26,6 +25,5 @@ func Load(env string) structs.Config {
 	errMerge := util.MergeStruct(&commonConfig, envConfig)
 	exception.Handle(structs.Exception{Err: errMerge, Message: "Merging configs failed."})
 
-	fmt.Println(commonConfig)
 	return commonConfig
 }
