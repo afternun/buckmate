@@ -58,7 +58,7 @@ func downloadToFile(downloader *manager.Downloader, targetDirectory, bucket, key
 	}
 	defer fd.Close()
 
-	fmt.Printf("Downloading s3://%s/%s to %s...\n", bucket, key, file)
+	log.Debug("Downloading: " + key + " to: " + file)
 	if _, err := downloader.Download(context.TODO(), fd, &s3.GetObjectInput{Bucket: &bucket, Key: &key}); err != nil {
 		log.Fatal(err)
 	}
