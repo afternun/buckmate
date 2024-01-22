@@ -6,7 +6,7 @@ Common flags for every command:
 |--------|-------|------------------------------------------------------|---------|
 | `--env`  | `-e`    | Specifies environment specific configuration         | -       |
 | `--path` | `-p`    | Specifies directory that contains buckmate directory | -       |
-| `--log` | `-l`    | Specifies log level, available options: TraceLevel, DebugLevel, InfoLevel, WarnLevel, ErrorLevel, FatalLevel, PanicLevel | InfoLevel       |
+| `--log` | `-l`    | Specifies log level, available options: panic, fatal, error, warn, info, debug, trace | info       |
 
 ## apply
 

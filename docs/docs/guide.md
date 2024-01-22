@@ -113,3 +113,8 @@ or download latest release from GitHub:
 ```
   buckmate apply
 ```
+
+!!! note "Versioning"
+
+    **buckmate** will add metadata to S3 objects `buckmate-version` with UUID string as value.
+    This is used to differentiate between previous and new deployment. Files that do not match new version will be removed on the deployment.
