@@ -12,6 +12,9 @@
 
     [Releases](https://github.com/afternun/buckmate/releases)
 
+    ```
+    curl https://github.com/afternun/buckmate/releases/download/0.0.1/buckmate_0.0.1_darwin_amd64.tar.gz -LO && tar -xzvf buckmate_0.0.1_darwin_amd64.tar.gz && mv buckmate /usr/local/bin
+    ```
 !!! note "Configure AWS credentials"
 
     If you are deploying to or from AWS S3 bucket configure AWS credentials according to their instructions.
