@@ -1,25 +1,72 @@
-1. Install **buckmate**
+## Installation
 
-=== "Build from source"
+Build from source:
+    
+```
+git clone https://github.com/afternun/buckmate.git && go build -C buckmate && mv buckmate/buckmate /usr/local/bin
+``` 
+
+or download latest release from GitHub:
+
+
+=== "MacOS ARM"
 
     ```
-    git clone afternun/buckmate
-    go build
-    mv buckmate /usr/local/bin
+    curl https://github.com/afternun/buckmate/releases/latest/download/buckmate_Darwin_arm64.tar.gz -LO && tar -xzvf buckmate_Darwin_arm64.tar.gz && mv buckmate /usr/local/bin
     ```
-
-=== "Download latest release from GitHub"
-
-    [Releases](https://github.com/afternun/buckmate/releases)
+    
+    === "MacOS x86_64"
 
     ```
-    curl https://github.com/afternun/buckmate/releases/download/0.0.1/buckmate_0.0.1_darwin_amd64.tar.gz -LO && tar -xzvf buckmate_0.0.1_darwin_amd64.tar.gz && mv buckmate /usr/local/bin
+    curl https://github.com/afternun/buckmate/releases/latest/download/buckmate_Darwin_x86_64.tar.gz -LO && tar -xzvf buckmate_Darwin_x86_64.tar.gz && mv buckmate /usr/local/bin
     ```
+
+=== "Linux ARM"
+
+    ```
+    curl https://github.com/afternun/buckmate/releases/latest/download/buckmate_Linux_arm64.tar.gz -LO && tar -xzvf buckmate_Linux_arm64.tar.gz && mv buckmate /usr/local/bin
+    ```
+    
+    === "Linux i386"
+
+    ```
+    curl https://github.com/afternun/buckmate/releases/latest/download/buckmate_Linux_i386.tar.gz -LO && tar -xzvf buckmate_Linux_i386.tar.gz && mv buckmate /usr/local/bin
+    ```
+    
+    === "Linux x86_64"
+
+    ```
+    curl https://github.com/afternun/buckmate/releases/latest/download/buckmate_Linux_x86_64.tar.gz -LO && tar -xzvf buckmate_Linux_x86_64.tar.gz && mv buckmate /usr/local/bin
+    ```
+
+=== "Windows ARM"
+
+    ```
+    curl.exe https://github.com/afternun/buckmate/releases/latest/download/buckmate_Windows_arm64.tar.gz -LO
+    ```
+    
+    === "Windows i386"
+
+    ```
+    curl.exe https://github.com/afternun/buckmate/releases/latest/download/buckmate_Windows_i386.tar.gz -LO
+    ```
+    
+    === "Windows x86_64"
+
+    ```
+    curl.exe https://github.com/afternun/buckmate/releases/latest/download/buckmate_Windows_x86_64.tar.gz -LO
+    ```
+
+    Append directory containing above binary to PATH environment variable
+
+
+[Browse releases here](https://github.com/afternun/buckmate/releases)
+
+## Initial setup
+
 !!! note "Configure AWS credentials"
 
     If you are deploying to or from AWS S3 bucket configure AWS credentials according to their instructions.
-
-2. Create **buckmate** directory
 
 !!! note "Examples"
 
@@ -61,7 +108,7 @@
 
     This can hold environment specific configuration. To use it, run **buckmate** with `--env` flag
 
-3. Run **buckmate**
+## Run
 
 ```
   buckmate apply
