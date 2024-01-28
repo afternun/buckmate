@@ -104,13 +104,15 @@ func removeVersion(bucket string, paginator *s3.ListObjectsV2Paginator, headObjC
 			}
 		}
 	}
-	_, err := removeObjClient.DeleteObjects(context.TODO(), &s3.DeleteObjectsInput{
-		Bucket: &bucket,
-		Delete: &types.Delete{
-			Objects: objectsToRemove,
-		},
-	})
-	if err != nil {
-		log.Fatal(err)
+	if len(objectsToRemove) > 0 {
+		_, err := removeObjClient.DeleteObjects(context.TODO(), &s3.DeleteObjectsInput{
+			Bucket: &bucket,
+			Delete: &types.Delete{
+				Objects: objectsToRemove,
+			},
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }

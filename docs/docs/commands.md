@@ -5,7 +5,7 @@ Common flags for every command:
 | Flag   | Short | Description                                          | Default |
 |--------|-------|------------------------------------------------------|---------|
 | `--env`  | `-e`    | Specifies environment specific configuration         | -       |
-| `--path` | `-p`    | Specifies directory that contains buckmate directory | -       |
+| `--path` | `-p`    | Specifies directory that contains Deployment.yaml file | -       |
 | `--log` | `-l`    | Specifies log level, available options: panic, fatal, error, warn, info, debug, trace | info       |
 
 ## apply

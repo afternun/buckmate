@@ -81,12 +81,12 @@ or download latest release from GitHub:
       address: location from which files should be copied 
       (use `s3://` prefix for s3 buckets,
        absolute path for files on disk,
-       or path relative to root directory)
+       or path relative to location of this file)
     target:
       address: location to which files should be copied
       (use `s3://` prefix for s3 buckets,
        absolute path for files on disk,
-       or path relative to root directory)
+       or path relative to location of this file)
     configBoundary: string that acts as prefix and suffix for config map values (Default %%%)
     configMap:
       string key: string value

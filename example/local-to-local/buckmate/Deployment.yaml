@@ -1,7 +1,7 @@
 source:
-  address: "buckmate-source"
+  address: "../buckmate-source"
 target:
-  address: "buckmate-target"
+  address: "../buckmate-target"
 configBoundary: "%%%"
 configMap:
   paragraph: "This is common paragraph."

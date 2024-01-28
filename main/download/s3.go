@@ -2,7 +2,6 @@ package download
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -37,7 +36,7 @@ func S3(bucket string, prefix string, tempDir string) {
 			log.Fatal(err)
 		}
 		for _, obj := range page.Contents {
-			fmt.Printf("Current obj %s \n", aws.ToString(obj.Key))
+			log.Debug("Current obj %s \n", aws.ToString(obj.Key))
 			if obj.Size > 0 {
 				downloadToFile(manager, tempDir, bucket, aws.ToString(obj.Key), prefix)
 			}

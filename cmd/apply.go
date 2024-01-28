@@ -5,6 +5,7 @@ import (
 	"buckmate/main/deployment"
 	"buckmate/main/download"
 	"buckmate/main/upload"
+	"os"
 
 	log "github.com/sirupsen/logrus"
 
@@ -29,9 +30,14 @@ buckmate apply
 		if err != nil {
 			log.Fatal(err)
 		}
+		workDir, err := os.Getwd()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		rootDir := util.Resolve(workDir, path)
 
 		s3Prefix := "s3://"
-		rootDir := path + "/buckmate"
 		tempDir := util.RandomDirectory()
 		deploymentConfig := deployment.Load(env, rootDir)
 		buckmateVersion := uuid.New().String()
@@ -40,9 +46,7 @@ buckmate apply
 			deploymentConfig.Source.Address = strings.Replace(deploymentConfig.Source.Address, s3Prefix, "", 1)
 			download.S3(deploymentConfig.Source.Address, deploymentConfig.Source.Prefix, tempDir)
 		} else {
-			if !strings.HasPrefix(deploymentConfig.Source.Address, "/") {
-				deploymentConfig.Source.Address = path + "/" + deploymentConfig.Source.Address
-			}
+			deploymentConfig.Source.Address = util.Resolve(rootDir, deploymentConfig.Source.Address)
 			err := util.CopyDirectory(deploymentConfig.Source.Address, tempDir)
 			if err != nil {
 				log.Fatal(err)
@@ -63,9 +67,7 @@ buckmate apply
 			deploymentConfig.Target.Address = strings.Replace(deploymentConfig.Target.Address, s3Prefix, "", 1)
 			upload.S3(deploymentConfig.Target.Address, deploymentConfig.Target.Prefix, buckmateVersion, tempDir)
 		} else {
-			if !strings.HasPrefix(deploymentConfig.Target.Address, "/") {
-				deploymentConfig.Target.Address = path + "/" + deploymentConfig.Target.Address
-			}
+			deploymentConfig.Target.Address = util.Resolve(rootDir, deploymentConfig.Target.Address)
 			util.CopyDirectory(tempDir, deploymentConfig.Target.Address)
 		}
 
