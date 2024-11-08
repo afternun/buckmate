@@ -2,9 +2,8 @@ package cmd
 
 import (
 	"buckmate/main/common/util"
-	"buckmate/main/deployment"
-
-	log "github.com/sirupsen/logrus"
+	"buckmate/main/deploymentConfig"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -25,8 +24,14 @@ buckmate config`,
 		}
 		rootDir := path + "/buckmate"
 
-		tempDir := util.RandomDirectory()
-		config := deployment.Load(env, rootDir)
+		tempDir, err := util.RandomDirectory()
+		if err != nil {
+			log.Fatal(err)
+		}
+		config, err := deploymentConfig.Load(env, rootDir)
+		if err != nil {
+			log.Fatal(err)
+		}
 		err = util.CopyDirectory(rootDir+"/files", tempDir)
 		if err != nil {
 			log.Fatal(err)
@@ -35,9 +40,12 @@ buckmate config`,
 		if err != nil {
 			log.Fatal(err)
 		}
-		util.ReplaceInFiles(tempDir, config.ConfigBoundary, config.ConfigMap)
+		err = util.ReplaceInFiles(tempDir, config.ConfigBoundary, config.ConfigMap)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-		log.Info("You can view your configuration in: " + tempDir)
+		log.Println("You can view your configuration in: " + tempDir)
 	},
 }
 

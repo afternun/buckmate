@@ -2,20 +2,16 @@ package util
 
 import (
 	"os"
-
-	log "github.com/sirupsen/logrus"
 )
 
-func RandomDirectory() string {
+func RandomDirectory() (string, error) {
 	dirName, err := os.MkdirTemp("", "")
 	if err != nil {
-		log.Fatal("Could not create temporary directory.")
+		return "", err
 	}
-	return dirName
+	return dirName, nil
 }
 
-func RemoveDirectory(path string) {
-	if err := os.RemoveAll(path); err != nil {
-		log.Fatal("Could not remove tmp directory.")
-	}
+func RemoveDirectory(path string) error {
+	return os.RemoveAll(path)
 }

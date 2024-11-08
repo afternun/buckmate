@@ -6,3 +6,8 @@ configBoundary: "%%%"
 configMap:
   paragraph: "This is common paragraph."
   header: "This is common header."
+fileOptions:
+  common-file.json: 
+    metadata: 
+      some-metadata-key: test
+    cacheControl: no-store

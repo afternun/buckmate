@@ -3,31 +3,33 @@ package util
 import (
 	"bytes"
 	"os"
-
-	log "github.com/sirupsen/logrus"
 )
 
-func ReplaceInFiles(path string, boundary string, configMap map[string]string) {
+func ReplaceInFiles(path string, boundary string, configMap map[string]string) error {
 	files, err := os.ReadDir(path)
 	if err != nil {
-		log.Fatal("Couldn't list files under " + path)
+		return err
 	}
 	for _, file := range files {
 		if !file.IsDir() {
 			err := ReplaceInFile(path+"/"+file.Name(), boundary, configMap)
 			if err != nil {
-				log.Fatal("Couldn't apply config map to " + path)
+				return err
 			}
 		} else {
-			ReplaceInFiles(path+"/"+file.Name(), boundary, configMap)
+			err := ReplaceInFiles(path+"/"+file.Name(), boundary, configMap)
+			if err != nil {
+				return err
+			}
 		}
 	}
+	return nil
 }
 
 func ReplaceInFile(path string, boundary string, configMap map[string]string) error {
 	read, err := os.ReadFile(path)
 	if err != nil {
-		log.Fatal("Could not load file " + path)
+		return err
 	}
 	for key, value := range configMap {
 		read = bytes.ReplaceAll(read, []byte(boundary+key+boundary), []byte(value))

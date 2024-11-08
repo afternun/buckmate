@@ -1,14 +1,11 @@
 package cmd
 
 import (
+	"buckmate/main/aws"
 	"buckmate/main/common/util"
-	"buckmate/main/deployment"
-	"buckmate/main/download"
-	"buckmate/main/upload"
+	"buckmate/main/deploymentConfig"
+	"log"
 	"os"
-
-	log "github.com/sirupsen/logrus"
-
 	"strings"
 
 	"github.com/google/uuid"
@@ -26,10 +23,12 @@ buckmate apply
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		path, err := cmd.Flags().GetString("path")
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		workDir, err := os.Getwd()
 		if err != nil {
 			log.Fatal(err)
@@ -38,16 +37,35 @@ buckmate apply
 		rootDir := util.Resolve(workDir, path)
 
 		s3Prefix := "s3://"
-		tempDir := util.RandomDirectory()
-		deploymentConfig := deployment.Load(env, rootDir)
+		tempDir, err := util.RandomDirectory()
+		if err != nil {
+			log.Fatal(err)
+		}
+		dConfig, err := deploymentConfig.Load(env, rootDir)
+		if err != nil {
+			log.Fatal(err)
+		}
 		buckmateVersion := uuid.New().String()
 
-		if strings.HasPrefix(deploymentConfig.Source.Address, s3Prefix) {
-			deploymentConfig.Source.Address = strings.Replace(deploymentConfig.Source.Address, s3Prefix, "", 1)
-			download.S3(deploymentConfig.Source.Address, deploymentConfig.Source.Prefix, tempDir)
+		client, err := aws.Init()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if strings.HasPrefix(dConfig.Source.Address, s3Prefix) {
+			dConfig.Source.Address = strings.Replace(dConfig.Source.Address, s3Prefix, "", 1)
+			sourceBucket := aws.NewBucket(client, dConfig.Source)
+			downloadOptions := aws.DownloadOptions{
+				Prefix:  dConfig.Source.Prefix,
+				TempDir: tempDir,
+			}
+			err := sourceBucket.Download(cmd.Context(), downloadOptions)
+			if err != nil {
+				log.Fatal(err)
+			}
 		} else {
-			deploymentConfig.Source.Address = util.Resolve(rootDir, deploymentConfig.Source.Address)
-			err := util.CopyDirectory(deploymentConfig.Source.Address, tempDir)
+			dConfig.Source.Address = util.Resolve(rootDir, dConfig.Source.Address)
+			err := util.CopyDirectory(dConfig.Source.Address, tempDir)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -57,21 +75,58 @@ buckmate apply
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		err = util.CopyDirectory(rootDir+"/"+env+"/files/", tempDir)
 		if err != nil {
 			log.Fatal(err)
 		}
-		util.ReplaceInFiles(tempDir, deploymentConfig.ConfigBoundary, deploymentConfig.ConfigMap)
 
-		if strings.HasPrefix(deploymentConfig.Target.Address, s3Prefix) {
-			deploymentConfig.Target.Address = strings.Replace(deploymentConfig.Target.Address, s3Prefix, "", 1)
-			upload.S3(deploymentConfig.Target.Address, deploymentConfig.Target.Prefix, buckmateVersion, tempDir)
-		} else {
-			deploymentConfig.Target.Address = util.Resolve(rootDir, deploymentConfig.Target.Address)
-			util.CopyDirectory(tempDir, deploymentConfig.Target.Address)
+		err = util.ReplaceInFiles(tempDir, dConfig.ConfigBoundary, dConfig.ConfigMap)
+		if err != nil {
+			log.Fatal(err)
 		}
 
-		util.RemoveDirectory(tempDir)
+		if strings.HasPrefix(dConfig.Target.Address, s3Prefix) {
+			dConfig.Target.Address = strings.Replace(dConfig.Target.Address, s3Prefix, "", 1)
+			metadata := map[string]string{deploymentConfig.InternalBuckmateVersionMetadataKey: buckmateVersion}
+			if dConfig.FileOptions != nil {
+				dConfig.FileOptions[aws.InternalBuckmateFilePrefix] = deploymentConfig.FileOptions{Metadata: metadata}
+			} else {
+				dConfig.FileOptions = map[string]deploymentConfig.FileOptions{aws.InternalBuckmateFilePrefix: {Metadata: metadata}}
+			}
+
+			targetBucket := aws.NewBucket(client, dConfig.Target)
+
+			uploadOptions := aws.UploadOptions{
+				Prefix:      dConfig.Target.Prefix,
+				FileOptions: dConfig.FileOptions,
+				TempDir:     tempDir,
+			}
+			err := targetBucket.Upload(cmd.Context(), uploadOptions)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			removeOptions := aws.RemoveOptions{
+				CurrentVersion: buckmateVersion,
+			}
+
+			err = targetBucket.RemovePreviousVersion(cmd.Context(), removeOptions)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			dConfig.Target.Address = util.Resolve(rootDir, dConfig.Target.Address)
+			err = util.CopyDirectory(tempDir, dConfig.Target.Address)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
+		err = util.RemoveDirectory(tempDir)
+		if err != nil {
+			log.Fatal(err)
+		}
 	},
 }
 

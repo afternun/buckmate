@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	log "github.com/sirupsen/logrus"
+	"log"
+
 	"github.com/spf13/cobra"
 )
 
@@ -9,18 +10,12 @@ var rootCmd = &cobra.Command{
 	Use:     "buckmate",
 	Short:   "Deploy to S3 buckets with ease",
 	Long:    ``,
-	Version: "0.0.1",
+	Version: "0.2.0",
 	Run: func(cmd *cobra.Command, args []string) {
-		logLevel, err := cmd.Flags().GetString("log")
+		err := cmd.Help()
 		if err != nil {
 			log.Fatal(err)
 		}
-		parsedLogLevel, err := log.ParseLevel(logLevel)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.SetLevel(parsedLogLevel)
-		cmd.Help()
 	},
 }
 
