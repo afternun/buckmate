@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 )
 
-func RemoveAllFromDirectory(srcDir string) error {
-	return os.RemoveAll(srcDir + "/")
+func RemoveAllFromDirectory(dir string) error {
+	return os.RemoveAll(dir + "/*")
 }
 func CopyDirectory(scrDir string, dest string) error {
 	entries, err := os.ReadDir(scrDir)

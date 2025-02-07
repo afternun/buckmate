@@ -22,6 +22,7 @@ local_to_local () {
     echo "Starting local-to-local test"
     prepare_directory_to_test
     cp -R ../../example/local-to-local/* ./
+    ls
     ./buckmate-executable --path buckmate apply
     compare_results "../result" "buckmate-target"
 }
