@@ -104,13 +104,21 @@ cache_control_metadata () {
     echo "SUCCESS"
 }
 
-keep_previous() {
+keep_previous_remote() {
     echo "Starting local-to-s3-keep-previous test"
     prepare_directory_to_test
     cp -R ../../example/local-to-s3-keep-previous/* ./
     ./buckmate-executable --path buckmate apply
     mkdir buckmate-target
     aws s3 cp s3://buckmate-keep-previous buckmate-target --recursive
+    compare_results "../result-keep-previous" "buckmate-target"
+}
+
+keep_previous_local() {
+    echo "Starting local-to-local-keep-previous test"
+    prepare_directory_to_test
+    cp -R ../../example/local-to-local-keep-previous/* ./
+    ./buckmate-executable --path buckmate apply
     compare_results "../result-keep-previous" "buckmate-target"
 }
 
@@ -122,3 +130,4 @@ dry_local
 dry_remote
 cache_control_metadata
 keep_previous
+keep_previous_local

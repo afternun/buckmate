@@ -131,6 +131,12 @@ buckmate apply
 				if err != nil {
 					log.Fatal(err)
 				}
+				if !dConfig.KeepPrevious {
+					err = util.RemoveAllFromDirectory(dConfig.Target.Address)
+					if err != nil {
+						log.Fatal(err)
+					}
+				}
 			}
 		}
 
