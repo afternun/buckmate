@@ -14,7 +14,7 @@ type Location struct {
 
 type FileOptions struct {
 	Metadata     map[string]string `yaml:"metadata"`
-	CacheControl *string           `yaml:"cacheControl"`
+	CacheControl string           `yaml:"cacheControl"`
 }
 
 type Deployment struct {

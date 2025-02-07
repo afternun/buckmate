@@ -108,7 +108,7 @@ func (bucket Bucket) Upload(context context.Context, options UploadOptions) (err
 			Key:          fileKey,
 			Body:         file,
 			Metadata:     metadataForFile,
-			CacheControl: options.FileOptions[*fileKey].CacheControl,
+			CacheControl: aws.String(options.FileOptions[*fileKey].CacheControl),
 		})
 		file.Close()
 		if err != nil {

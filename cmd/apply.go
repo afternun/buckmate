@@ -29,6 +29,11 @@ buckmate apply
 			log.Fatal(err)
 		}
 
+		dry, err := cmd.Flags().GetBool("dry")
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		workDir, err := os.Getwd()
 		if err != nil {
 			log.Fatal(err)
@@ -95,35 +100,43 @@ buckmate apply
 				dConfig.FileOptions = map[string]deploymentConfig.FileOptions{aws.InternalBuckmateFilePrefix: {Metadata: metadata}}
 			}
 
-			targetBucket := aws.NewBucket(client, dConfig.Target)
+			if dry == false {
+				targetBucket := aws.NewBucket(client, dConfig.Target)
 
-			uploadOptions := aws.UploadOptions{
-				Prefix:      dConfig.Target.Prefix,
-				FileOptions: dConfig.FileOptions,
-				TempDir:     tempDir,
-			}
-			err := targetBucket.Upload(cmd.Context(), uploadOptions)
-			if err != nil {
-				log.Fatal(err)
-			}
+				uploadOptions := aws.UploadOptions{
+					Prefix:      dConfig.Target.Prefix,
+					FileOptions: dConfig.FileOptions,
+					TempDir:     tempDir,
+					}
+					err := targetBucket.Upload(cmd.Context(), uploadOptions)
+					if err != nil {
+						log.Fatal(err)
+					}
 
-			removeOptions := aws.RemoveOptions{
-				CurrentVersion: buckmateVersion,
-			}
+					removeOptions := aws.RemoveOptions{
+						CurrentVersion: buckmateVersion,
+						}
 
-			err = targetBucket.RemovePreviousVersion(cmd.Context(), removeOptions)
-			if err != nil {
-				log.Fatal(err)
+						err = targetBucket.RemovePreviousVersion(cmd.Context(), removeOptions)
+						if err != nil {
+							log.Fatal(err)
+						}
 			}
 		} else {
-			dConfig.Target.Address = util.Resolve(rootDir, dConfig.Target.Address)
-			err = util.CopyDirectory(tempDir, dConfig.Target.Address)
-			if err != nil {
-				log.Fatal(err)
+			if dry == false {
+				dConfig.Target.Address = util.Resolve(rootDir, dConfig.Target.Address)
+				err = util.CopyDirectory(tempDir, dConfig.Target.Address)
+				if err != nil {
+					log.Fatal(err)
+				}
 			}
 		}
 
-		err = util.RemoveDirectory(tempDir)
+		if dry == false {
+			err = util.RemoveDirectory(tempDir)
+		} else {
+			log.Println("Path to your dry run result: " + tempDir)
+		}
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -132,4 +145,5 @@ buckmate apply
 
 func init() {
 	rootCmd.AddCommand(applyCmd)
+	applyCmd.PersistentFlags().BoolP("dry", "d", false, "Dry run, do not upload files.")
 }

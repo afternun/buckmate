@@ -1,0 +1,1 @@
+go build && mv buckmate /usr/local/bin

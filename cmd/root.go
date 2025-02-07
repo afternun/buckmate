@@ -29,5 +29,4 @@ func Execute() {
 func init() {
 	rootCmd.PersistentFlags().StringP("env", "e", "", "Specifies which config to apply - directory name that contains environment specific Config.yaml and files to be copied.")
 	rootCmd.PersistentFlags().StringP("path", "p", "", "Specifies path to the directory that contains buckmate directory with Deployment.yaml config.")
-	rootCmd.PersistentFlags().StringP("log", "l", "info", "Specifies log level. Options: panic, fatal, error, warn, info, debug, trace.")
 }
