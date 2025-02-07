@@ -100,30 +100,32 @@ buckmate apply
 				dConfig.FileOptions = map[string]deploymentConfig.FileOptions{aws.InternalBuckmateFilePrefix: {Metadata: metadata}}
 			}
 
-			if dry == false {
+			if !dry {
 				targetBucket := aws.NewBucket(client, dConfig.Target)
 
 				uploadOptions := aws.UploadOptions{
 					Prefix:      dConfig.Target.Prefix,
 					FileOptions: dConfig.FileOptions,
 					TempDir:     tempDir,
+				}
+				err := targetBucket.Upload(cmd.Context(), uploadOptions)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				if !dConfig.KeepPrevious {
+					removeOptions := aws.RemoveOptions{
+						CurrentVersion: buckmateVersion,
 					}
-					err := targetBucket.Upload(cmd.Context(), uploadOptions)
+
+					err = targetBucket.RemovePreviousVersion(cmd.Context(), removeOptions)
 					if err != nil {
 						log.Fatal(err)
 					}
-
-					removeOptions := aws.RemoveOptions{
-						CurrentVersion: buckmateVersion,
-						}
-
-						err = targetBucket.RemovePreviousVersion(cmd.Context(), removeOptions)
-						if err != nil {
-							log.Fatal(err)
-						}
+				}
 			}
 		} else {
-			if dry == false {
+			if !dry {
 				dConfig.Target.Address = util.Resolve(rootDir, dConfig.Target.Address)
 				err = util.CopyDirectory(tempDir, dConfig.Target.Address)
 				if err != nil {
@@ -132,10 +134,10 @@ buckmate apply
 			}
 		}
 
-		if dry == false {
+		if !dry {
 			err = util.RemoveDirectory(tempDir)
 		} else {
-			log.Println("Path to your dry run result: " + tempDir)
+			log.Println(tempDir)
 		}
 		if err != nil {
 			log.Fatal(err)

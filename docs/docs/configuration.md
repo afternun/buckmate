@@ -20,6 +20,13 @@ Location to which files should be copied (use `s3://` prefix for s3 buckets, abs
 
 String that acts as prefix and suffix for config map values.
 
+### keepPrevious
+* ##### Type: `bool`
+* ##### Required: `false`
+* ##### Default: `false`
+
+Whether Buckmate should clear files belonging to previous versions in the source destination.
+
 ### configMap
 * ##### Type: `Record<string, string>`
 * ##### Required: `false`

@@ -65,18 +65,13 @@ func NewBucket(client *s3.Client, location deploymentConfig.Location) (bucket Bu
 
 func (bucket Bucket) Upload(context context.Context, options UploadOptions) (err error) {
 	walker := make(fileWalk)
-	errs := make(chan error, 1)
 
 	go func() {
 		if err := filepath.Walk(options.TempDir, walker.Walk); err != nil {
-			errs <- err
+			log.Fatal(err)
 		}
 		close(walker)
 	}()
-
-	if err := <-errs; err != nil {
-		log.Fatal(err)
-	}
 
 	for path := range walker {
 		rel, err := filepath.Rel(options.TempDir, path)

@@ -21,6 +21,7 @@ type Deployment struct {
 	Source         Location               `yaml:"source"`
 	Target         Location               `yaml:"target"`
 	ConfigBoundary string                 `yaml:"configBoundary"`
+	KeepPrevious   bool					  `yaml:"keepPrevious"`
 	ConfigMap      map[string]string      `yaml:"configMap"`
 	FileOptions    map[string]FileOptions `yaml:"fileOptions"`
 }
@@ -48,6 +49,7 @@ func Load(env string, rootDir string) (Deployment, error) {
 
 	commonConfig := Deployment{}
 	commonConfig.ConfigBoundary = "%%%"
+	commonConfig.KeepPrevious = false
 
 	err = util.YamlToStruct(commonFile, &commonConfig)
 	if err != nil {
