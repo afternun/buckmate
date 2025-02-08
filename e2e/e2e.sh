@@ -22,7 +22,6 @@ local_to_local () {
     echo "Starting local-to-local test"
     prepare_directory_to_test
     cp -R ../../example/local-to-local/* ./
-    ls
     ./buckmate-executable --path buckmate apply
     compare_results "../result" "buckmate-target"
 }
@@ -123,6 +122,14 @@ keep_previous_local() {
     compare_results "../result-keep-previous" "buckmate-target"
 }
 
+local_to_local_dev() {
+    echo "Starting local-to-local-dev test"
+    prepare_directory_to_test
+    cp -R ../../example/local-to-local/* ./
+    ./buckmate-executable --path buckmate --env dev apply
+    compare_results "../result-dev" "buckmate-target"
+}
+
 local_to_local
 s3_to_s3
 local_to_s3
@@ -132,3 +139,4 @@ dry_remote
 cache_control_metadata
 keep_previous
 keep_previous_local
+local_to_local_dev

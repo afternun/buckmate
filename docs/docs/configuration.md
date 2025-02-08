@@ -6,7 +6,14 @@
 
 Location from which files should be copied (use `s3://` prefix for s3 buckets, absolute path for files on disk, or path relative to location of this file).
 
-### source.target
+### source.prefix
+* ##### Type: `string`
+* ##### Required: `false`
+* ##### Default: `none`
+
+Prefix to use when downloading files from bucket. Useful if your bucket holds many versions or various types of data.
+
+### target.address
 * ##### Type: `string`
 * ##### Required: `true`
 * ##### Default: `none`
